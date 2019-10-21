@@ -96,9 +96,13 @@ print(states)
 # write a loop that iterates over states to calculate the median white-good
 # bias per state
 # store the results in a dataframe with 2 columns: state & bias
-for state in states: ## I haven't made this right
-        bias = IAT_clean[IAT_clean[state], 'D_white_bias'].median()
-        
+
+state_bias_df = pd.DataFrame(columns=['state', 'bias'])
+for state in states:
+    median = IAT_clean[IAT_clean.state == state].D_white_bias.median()
+    state_bias_df = state_bias_df.append({'state': state, 
+                                    'bias': median}, ignore_index=True)
+state_bias_df = state_bias_df.sort_values(by=['state'])
     
 
 
