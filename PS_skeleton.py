@@ -13,6 +13,8 @@ up the questions between you, or better yet, work together on the questions to
 overcome potential hurdles 
 """
 
+### This assignment is completed by An Qi Zhang, Rebekah Reuben, Laura Gravelsins, 
+### and Xiao Min Chang.
 #%% import packages 
 import os
 import numpy as np
