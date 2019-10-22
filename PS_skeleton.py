@@ -72,17 +72,26 @@ print(IAT_clean)
 # use sorting and indexing to print out the following information:
 
 # the ids of the 5 participants with the fastest reaction times
-IAT_clean = IAT_clean.sort_values(by='rt')
-IAT_clean.head()
+IAT_sorted = IAT_clean.sort_values(by='rt')
+fastest_id = IAT_sorted.head().loc[:, 'id'] # using .loc[] and .head() 
+fastest_id_v2 = IAT_sorted.id[0:5] # can also index the first 5 entries of the 'id' column
+print(fastest_id.values) # using .values so that only the id is printed (not the index value) 
+print(fastest_id_v2.values)
 
 # the ids of the 5 men with the strongest white-good bias
-IAT_clean = IAT_clean.sort_values(['gender', 'D_white_bias'], ascending = [True, False])
-IAT_clean.head()
+IAT_sorted = IAT_clean.sort_values(['gender', 'D_white_bias'], ascending = [True, False])
+biasedmen_id = IAT_sorted.head().loc[:, 'id'] # using .loc[] and .head()
+biasedmen_id_v2 = IAT_sorted.id[0:5] # can also index the first 5 entries of the 'id' column 
+print(biasedmen_id.values) # using .values so that only the id is printed (not the index value) 
+print(biasedmen_id_v2.values)
 
 # the ids of the 5 women in new york with the strongest white-good bias
-IAT_clean_NY_WOMEN = IAT_clean[(IAT_clean.state == 'NY') & (IAT_clean.gender == 2)]
-IAT_clean_NY_WOMEN.sort_values(['D_white_bias'], ascending = [False])
-IAT_clean_NY_WOMEN.head()
+IAT_NY_women = IAT_clean[(IAT_clean.state == 'NY') & (IAT_clean.gender == 2)]
+IAT_sorted_NY_women = IAT_NY_women.sort_values(['D_white_bias'], ascending = [False])
+biasedwomen_id = IAT_sorted_NY_women.head().loc[:, 'id'] # using .loc[] and .head()
+biasedwomen_id_v2 = IAT_sorted_NY_women.id[0:5] # can also index the first 5 entries of the 'id' column
+print(biasedwomen_id.values) # using .values so that only the id is printed (not the index value) 
+print(biasedwomen_id_v2.values)
 
 
 
@@ -126,24 +135,40 @@ state_race_bias= pd.pivot_table(IAT_clean, values = 'D_white_bias',
 
 # add a new variable that codes for whether or not a participant identifies as 
 # black/African American
-IAT_clean['is_black'] = 1*(IAT_clean.race==5)
+IAT_clean['is_black'] = 1*(IAT.loc[:,'race']==5)
 
 # use your new variable along with the crosstab function to calculate the 
 # proportion of each state's population that is black 
 # *hint check out the normalization options
-prop_black = (pd.crosstab(IAT_clean.state, IAT_clean.is_black, normalize='index'))
+prop_black = pd.crosstab(IAT_clean.state, IAT_clean.is_black, normalize=
+                         'index')
+prop_black = prop_black.loc[:, 1]
+prop_black = prop_black.rename('prop_black')
 
 # state_pop.xlsx contains census data from 2000 taken from http://www.censusscope.org/us/rank_race_blackafricanamerican.html
 # the last column contains the proportion of residents who identify as 
 # black/African American 
 # read in this file and merge its contents with your prop_black table
-census =...
-merged =...
+cencus_path = os.path.dirname(os.path.realpath(__file__)) + '\state_pop.xlsx'
+census = pd.read_excel(cencus_path)
+census_black = pd.concat([census.loc[:, 'State'], census.iloc[:, -1]], 
+                         axis=1, ignore_index=True)
+
+merged = pd.merge(census, prop_black, left_on='State', right_on='state')
+
 
 # use the corr method to correlate the census proportions to the sample proportions
+census_sample_corr = merged.corr().loc['per_black', 'prop_black']
 
 # now merge the census data with your state_race_bias pivot table
+merged_race = pd.merge(census, state_race_bias, left_on='State', 
+                       right_on='state')
 
 # use the corr method again to determine whether white_good biases is correlated 
 # with the proportion of the population which is black across states
 # calculate and print this correlation for white and black participants
+census_race_corr = merged_race.corr().loc['per_black', [5.0, 6.0]]
+
+print("The correlation for white participants is {:.3f}.\nThe correlation \
+for black participants is {:.3f}".format(census_race_corr.loc[5.0],
+      census_race_corr.loc[6.0]))
