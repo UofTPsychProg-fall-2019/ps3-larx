@@ -149,7 +149,7 @@ prop_black = prop_black.rename('prop_black')
 # the last column contains the proportion of residents who identify as 
 # black/African American 
 # read in this file and merge its contents with your prop_black table
-cencus_path = os.path.dirname(os.path.realpath(__file__)) + '\state_pop.xlsx'
+cencus_path = r'\Users\XiaoMin\Documents\GitHub\ps3-larx\state_pop.xlsx'
 census = pd.read_excel(cencus_path)
 census_black = pd.concat([census.loc[:, 'State'], census.iloc[:, -1]], 
                          axis=1, ignore_index=True)
